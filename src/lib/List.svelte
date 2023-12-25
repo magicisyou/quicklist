@@ -76,11 +76,20 @@
 
   input,
   button {
-    border: none;
+    border: solid #888 1px;
     padding: 15px;
   }
 
   input {
     width: 300px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    button,
+    input {
+      background-color: #333;
+      color: #f2f2f2;
+      border: solid #888 1px;
+    }
   }
 </style>

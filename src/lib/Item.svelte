@@ -2,7 +2,6 @@
   export let name = "";
   export let id = "";
   export let checked = false;
-
   export let onClick = () => {};
   export let onDelete = () => {};
 </script>
@@ -24,8 +23,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: #555;
     border-radius: 5px;
+    background-color: #cdcdcd;
   }
   .name {
     text-align: left;
@@ -45,5 +44,15 @@
   .remove-btn {
     padding: 10px;
     border: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .item {
+      background-color: #555;
+    }
+
+    .name {
+      color: #f2f2f2;
+    }
   }
 </style>
