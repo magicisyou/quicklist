@@ -10,8 +10,10 @@
   $: items = [];
 
   async function addItem() {
-    items = await invoke("add_item_to_list", { item: item_name });
-    saveToStore();
+    if (item_name != "") {
+      items = await invoke("add_item_to_list", { item: item_name });
+      saveToStore();
+    }
   }
 
   async function saveToStore() {

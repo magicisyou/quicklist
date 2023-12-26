@@ -8,11 +8,11 @@
 
 <div class="item">
   {#if checked}
-    <button class="name" on:click|preventDefault={onClick} {id}>{name}</button>
-  {:else}
     <button class="name-striked" on:click|preventDefault={onClick} {id}
       >{name}</button
     >
+  {:else}
+    <button class="name" on:click|preventDefault={onClick} {id}>{name}</button>
   {/if}
   <button class="remove-btn" on:click|preventDefault={onDelete} {id}>-</button>
 </div>
