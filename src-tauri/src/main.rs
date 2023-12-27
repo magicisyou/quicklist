@@ -52,6 +52,22 @@ fn remove_item_from_list(
     None
 }
 
+#[tauri::command]
+fn delete_list(app_handle: AppHandle, list_name: String) -> Option<Vec<String>> {
+    if let Ok(list_names) = app_handle.db(|db| database::delete_list(db, &list_name)) {
+        return Some(list_names);
+    }
+    None
+}
+
+#[tauri::command]
+fn get_list_names(app_handle: AppHandle) -> Option<Vec<String>> {
+    if let Ok(list_names) = app_handle.db(database::get_list_names) {
+        return Some(list_names);
+    }
+    None
+}
+
 fn main() {
     tauri::Builder::default()
         .manage(AppState {
@@ -70,6 +86,8 @@ fn main() {
             toggle_checked_value,
             get_list,
             remove_item_from_list,
+            get_list_names,
+            delete_list,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

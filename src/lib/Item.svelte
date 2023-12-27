@@ -1,9 +1,8 @@
 <script lang="ts">
   export let name = "";
-  export let id = "";
   export let checked = false;
-  export let onClick = () => {};
-  export let onDelete = () => {};
+  export let onClick;
+  export let onDelete;
 </script>
 
 <div class="item">
@@ -12,9 +11,9 @@
       >{name}</button
     >
   {:else}
-    <button class="name" on:click|preventDefault={onClick} {id}>{name}</button>
+    <button class="name" on:click|preventDefault={onClick}>{name}</button>
   {/if}
-  <button class="remove-btn" on:click|preventDefault={onDelete} {id}>-</button>
+  <button class="remove-btn" on:click|preventDefault={onDelete}>-</button>
 </div>
 
 <style scoped>
@@ -23,7 +22,6 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    border-radius: 5px;
     background-color: #cdcdcd;
   }
   .name {

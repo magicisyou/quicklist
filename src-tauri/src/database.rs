@@ -114,3 +114,21 @@ pub fn toggle_checked(
     statement.execute(named_params! { "@item": item_name, "@list": list_name })?;
     get_list(db, list_name)
 }
+
+pub fn get_list_names(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
+    let query = format!("SELECT DISTINCT list FROM {TABLE_NAME}");
+    let mut statement = db.prepare(&query)?;
+    let mut rows = statement.query([])?;
+    let mut list = vec![];
+    while let Some(row) = rows.next()? {
+        list.push(row.get("list")?);
+    }
+    Ok(list)
+}
+
+pub fn delete_list(db: &Connection, list_name: &str) -> Result<Vec<String>, rusqlite::Error> {
+    let query = format!("DELETE FROM {TABLE_NAME} WHERE list = @list");
+    let mut statement = db.prepare(&query)?;
+    statement.execute(named_params! {"@list": list_name})?;
+    get_list_names(db)
+}
