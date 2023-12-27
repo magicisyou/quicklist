@@ -31,7 +31,7 @@
   }
 
   async function toggleChecked() {
-    items = await invoke("toggle_checked_value", { itemName: this.id });
+    items = await invoke("toggle_checked_value", { itemName: this.innerText });
     saveToStore();
   }
 
@@ -39,35 +39,39 @@
     items = await invoke("remove_item_from_list", { itemName: this.id });
     saveToStore();
   }
-
   loadStore();
 </script>
 
-<div>
-  <form on:submit|preventDefault={addItem}>
-    <input
-      id="greet-input"
-      placeholder="Enter an item to list"
-      bind:value={item_name}
-    />
-    <button type="submit">Add</button>
-  </form>
-  <div class="list">
-    {#each items as item}
-      {#key item.name}
-        <Item
-          id={item.name}
-          name={item.name}
-          checked={item.checked}
-          onClick={toggleChecked}
-          onDelete={deleteItem}
-        />
-      {/key}
-    {/each}
+<div class="container">
+  <div>
+    <form on:submit|preventDefault={addItem}>
+      <input placeholder="Enter an item to list" bind:value={item_name} />
+      <button type="submit">Add</button>
+    </form>
+    <div class="list">
+      {#each items as item}
+        {#key item.name}
+          <Item
+            id={item.name}
+            name={item.name}
+            checked={item.checked}
+            onClick={toggleChecked}
+            onDelete={deleteItem}
+          />
+        {/key}
+      {/each}
+    </div>
   </div>
 </div>
 
 <style scoped>
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+    width: 100%;
+  }
   .list {
     padding: 10px;
     display: flex;
@@ -83,7 +87,7 @@
   }
 
   input {
-    width: 300px;
+    width: 400px;
   }
 
   @media (prefers-color-scheme: dark) {

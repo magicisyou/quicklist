@@ -8,7 +8,7 @@
 
 <div class="item">
   {#if checked}
-    <button class="name-striked" on:click|preventDefault={onClick} {id}
+    <button class="name-striked" on:click|preventDefault={onClick}
       >{name}</button
     >
   {:else}
