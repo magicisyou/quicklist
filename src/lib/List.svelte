@@ -1,45 +1,51 @@
 <script lang="ts">
   import Item from "./Item.svelte";
-  import { Store } from "tauri-plugin-store-api";
   import { invoke } from "@tauri-apps/api/tauri";
 
-  const store = new Store(".settings.dat");
-
+  let list_name = "list1";
   let item_name = "";
 
   $: items = [];
 
   async function addItem() {
     if (item_name != "") {
-      items = await invoke("add_item_to_list", { item: item_name });
-      saveToStore();
+      let list = await invoke("add_item_to_list", {
+        list: list_name,
+        item: item_name,
+      });
+      if (list) {
+        items = list;
+      }
     }
   }
 
-  async function saveToStore() {
-    let items_json = await invoke("get_list_state");
-    await store.set("list", { value: JSON.stringify(items_json) });
-    store.save();
-  }
-
-  async function loadStore() {
-    let val = await store.get("list");
-    if (val) {
-      let items_json = JSON.parse(val.value);
-      items = await invoke("build_list_from_memory", { items: items_json });
+  async function loadData() {
+    let list = await invoke("get_list", { listName: list_name });
+    if (list) {
+      items = list;
     }
   }
 
   async function toggleChecked() {
-    items = await invoke("toggle_checked_value", { itemName: this.innerText });
-    saveToStore();
+    let list = await invoke("toggle_checked_value", {
+      listName: list_name,
+      itemName: this.innerText,
+    });
+    if (list) {
+      items = list;
+    }
   }
 
   async function deleteItem() {
-    items = await invoke("remove_item_from_list", { itemName: this.id });
-    saveToStore();
+    let list = await invoke("remove_item_from_list", {
+      listName: list_name,
+      itemName: this.id,
+    });
+    if (list) {
+      items = list;
+    }
   }
-  loadStore();
+  loadData();
 </script>
 
 <div class="container">

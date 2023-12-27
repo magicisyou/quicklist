@@ -1,59 +1,76 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod database;
 mod list;
+mod state;
 
-use list::{Item, List};
+use list::{Item, ListItem};
+use state::{AppState, ServiceAccess};
 
-use std::sync::Mutex;
-use tauri::State;
+use tauri::{AppHandle, Manager, State};
 
-struct AppState {
-    list: Mutex<List>,
+#[tauri::command]
+fn add_item_to_list(app_handle: AppHandle, list: String, item: String) -> Option<Vec<Item>> {
+    if let Ok(list) =
+        app_handle.db(|db| database::add_item(db, &ListItem::from(&list, &item, false)))
+    {
+        return Some(list);
+    }
+    None
 }
 
 #[tauri::command]
-fn add_item_to_list(state: State<AppState>, item: String) -> Vec<Item> {
-    state.list.lock().unwrap().insert(item);
-    state.list.lock().unwrap().get_vec()
+fn toggle_checked_value(
+    app_handle: AppHandle,
+    list_name: String,
+    item_name: String,
+) -> Option<Vec<Item>> {
+    if let Ok(list) = app_handle.db(|db| database::toggle_checked(db, &list_name, &item_name)) {
+        return Some(list);
+    }
+    None
 }
 
 #[tauri::command]
-fn toggle_checked_value(state: State<AppState>, item_name: String) -> Vec<Item> {
-    state.list.lock().unwrap().toggle(&item_name);
-    state.list.lock().unwrap().get_vec()
+fn get_list(app_handle: AppHandle, list_name: String) -> Option<Vec<Item>> {
+    if let Ok(list) = app_handle.db(|db| database::get_list(db, &list_name)) {
+        return Some(list);
+    }
+    None
 }
 
 #[tauri::command]
-fn build_list_from_memory(state: State<AppState>, items: Vec<Item>) -> Vec<Item> {
-    state.list.lock().unwrap().update(items);
-    state.list.lock().unwrap().get_vec()
-}
-
-#[tauri::command]
-fn get_list_state(state: State<AppState>) -> Vec<Item> {
-    state.list.lock().unwrap().get_vec()
-}
-
-#[tauri::command]
-fn remove_item_from_list(state: State<AppState>, item_name: String) -> Vec<Item> {
-    state.list.lock().unwrap().remove(&item_name);
-    state.list.lock().unwrap().get_vec()
+fn remove_item_from_list(
+    app_handle: AppHandle,
+    list_name: String,
+    item_name: String,
+) -> Option<Vec<Item>> {
+    if let Ok(list) = app_handle.db(|db| database::delete_item(db, &list_name, &item_name)) {
+        return Some(list);
+    }
+    None
 }
 
 fn main() {
     tauri::Builder::default()
         .manage(AppState {
-            list: Mutex::new(List::new()),
+            db: Default::default(),
+        })
+        .setup(|app| {
+            let handle = app.handle();
+            let app_state: State<AppState> = handle.state();
+            let db =
+                database::initialize_database(&handle).expect("Database initialize should succeed");
+            *app_state.db.lock().unwrap() = Some(db);
+            Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             add_item_to_list,
             toggle_checked_value,
-            build_list_from_memory,
-            get_list_state,
+            get_list,
             remove_item_from_list,
         ])
-        .plugin(tauri_plugin_store::Builder::default().build())
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
