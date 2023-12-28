@@ -1,6 +1,6 @@
 [package]
 name = "quicklist"
-version = "0.1.1"
+version = "1.0.0"
 description = "To do list"
 authors = ["magicisyou"]
 license = "MIT"
